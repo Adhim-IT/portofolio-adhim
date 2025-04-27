@@ -3,29 +3,29 @@
 // Fungsi untuk mengambil data pengguna GitHub dan kontribusi
 export async function fetchGitHubData(username: string) {
   try {
-    // Ambil data pengguna dasar
-    const userResponse = await fetch(`https://api.github.com/users/${username}`, {
-      headers: {
-        // Tambahkan token GitHub Anda jika Anda memilikinya untuk meningkatkan batas rate
-       'Authorization': `token ${process.env.GITHUB_TOKEN}`,
-      },
-    })
-
-    if (!userResponse.ok) {
-      throw new Error(`GitHub API error: ${userResponse.status}`)
+    // Prepare headers - only add authorization if token exists
+    const headers: Record<string, string> = {};
+    if (process.env.GITHUB_TOKEN) {
+      headers['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
     }
 
-    const userData = await userResponse.json()
-
-    // Untuk repositori, kita perlu membuat panggilan API lain
-    const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=10`, {
-      headers: {
-        // 'Authorization': `token ${process.env.GITHUB_TOKEN}`,
-      },
-    })
-
+    // Fetch user data
+    const userResponse = await fetch(`https://api.github.com/users/${username}`, { headers });
+    
+    if (!userResponse.ok) {
+      throw new Error(`GitHub API error: ${userResponse.status}`);
+    }
+    
+    const userData = await userResponse.json();
+    
+    // Fetch repositories with same authentication
+    const reposResponse = await fetch(
+      `https://api.github.com/users/${username}/repos?sort=updated&per_page=10`, 
+      { headers }
+    );
+    
     if (!reposResponse.ok) {
-      throw new Error(`GitHub API error: ${reposResponse.status}`)
+      throw new Error(`GitHub API error: ${reposResponse.status}`);
     }
 
     const reposData = await reposResponse.json()

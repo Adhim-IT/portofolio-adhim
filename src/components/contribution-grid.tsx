@@ -71,7 +71,11 @@ export default function ContributionGrid({ contributionData, loading }: Contribu
                       type: "spring",
                       stiffness: 200,
                     }}
-                    whileHover={{ scale: 1.2 }}
+                    whileHover={{
+                      scale: 1.5,
+                      zIndex: 10,
+                      boxShadow: "0 0 8px rgba(59, 130, 246, 0.5)",
+                    }}
                   />
                 ))}
               </div>
